@@ -224,7 +224,7 @@ class CHIRPSCompleteWorkflow:
             print(f"  ❌ Extraction error: {e}")
             return False
     
-    def download_year_range(self, start_year=1981, end_year=2025):
+    def download_year_range(self, start_year=1981, end_year=2027):
         """
         Download all files for a range of years
         
@@ -233,7 +233,7 @@ class CHIRPSCompleteWorkflow:
         start_year : int
             Starting year (default: 1981 for CHIRPS v2.0)
         end_year : int
-            Ending year (default: 2025)
+            Ending year (default: 2027)
         """
         
         print(f"\n📥 DOWNLOADING: {start_year} to {end_year}")
@@ -504,7 +504,7 @@ class CHIRPSCompleteWorkflow:
         except Exception as e:
             print(f"    ⚠️ Preview error: {e}")
     
-    def validate_all_files(self, start_year=1981, end_year=2025, create_previews=True):
+    def validate_all_files(self, start_year=1981, end_year=2027, create_previews=True):
         """Validate all downloaded files"""
         
         print(f"\n🔍 VALIDATING ALL FILES: {start_year} to {end_year}")
@@ -584,7 +584,7 @@ class CHIRPSCompleteWorkflow:
     # COMPLETE WORKFLOW
     # =========================================================================
     
-    def run_complete_workflow(self, start_year=1981, end_year=2025, skip_download=False):
+    def run_complete_workflow(self, start_year=1981, end_year=2027, skip_download=False):
         """
         Run complete workflow: download and validate
         
@@ -593,7 +593,7 @@ class CHIRPSCompleteWorkflow:
         start_year : int
             Starting year (default: 1981)
         end_year : int
-            Ending year (default: 2025)
+            Ending year (default: 2027)
         skip_download : bool
             Skip download step (use existing files)
         """
@@ -672,8 +672,8 @@ def main():
     
     # Version selection
     print("\nSelect CHIRPS version:")
-    print("1. CHIRPS v2.0 (1981-2025, stable)")
-    print("2. CHIRPS v3.0 (2025+, latest)")
+    print("1. CHIRPS v2.0 (1981-2027, stable)")
+    print("2. CHIRPS v3.0 (2027+, latest)")
     
     version_choice = input("\nVersion (1-2) [default: 1]: ").strip()
     version = "2.0" if version_choice != "2" else "3.0"
@@ -699,7 +699,7 @@ def main():
             start_year = input("Start year [default: 1981]: ").strip()
             start_year = int(start_year) if start_year.isdigit() else 1981
             
-            end_year = input("End year [default: 2025]: ").strip()
+            end_year = input("End year [default: 2027]: ").strip()
             end_year = int(end_year) if end_year.isdigit() else 2025
             
             # Confirm for large downloads
@@ -720,7 +720,7 @@ def main():
             start_year = input("Start year [default: 1981]: ").strip()
             start_year = int(start_year) if start_year.isdigit() else 1981
             
-            end_year = input("End year [default: 2025]: ").strip()
+            end_year = input("End year [default: 2027]: ").strip()
             end_year = int(end_year) if end_year.isdigit() else 2025
             
             workflow.download_year_range(start_year, end_year)
@@ -732,7 +732,7 @@ def main():
             start_year = input("Start year [default: 1981]: ").strip()
             start_year = int(start_year) if start_year.isdigit() else 1981
             
-            end_year = input("End year [default: 2025]: ").strip()
+            end_year = input("End year [default: 2027]: ").strip()
             end_year = int(end_year) if end_year.isdigit() else 2025
             
             create_previews = input("Create preview images? (y/n) [default: y]: ").strip().lower()
@@ -760,7 +760,7 @@ def main():
             start_year = int(start_year) if start_year.isdigit() else 1981
             
             end_year = input("End year: ").strip()
-            end_year = int(end_year) if end_year.isdigit() else 2025
+            end_year = int(end_year) if end_year.isdigit() else 2027
             
             workflow.download_year_range(start_year, end_year)
         
@@ -818,7 +818,7 @@ if __name__ == "__main__":
     
     # Run the workflow
     print("\nSelect execution mode:")
-    print("1. Complete workflow (1981-2025)")
+    print("1. Complete workflow (1981-2027)")
     print("2. Quick start (test with 2020-2021)")
     print("3. Interactive menu")
     
@@ -826,7 +826,7 @@ if __name__ == "__main__":
     
     if mode == '1':
         workflow = CHIRPSCompleteWorkflow(version="2.0")
-        workflow.run_complete_workflow(start_year=1981, end_year=2025)
+        workflow.run_complete_workflow(start_year=1981, end_year=2027)
     elif mode == '2':
         quick_start()
     elif mode == '3':
