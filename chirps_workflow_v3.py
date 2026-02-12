@@ -58,6 +58,7 @@ class CHIRPSCompleteWorkflow:
             Product type: "final" or "prelim" (default: "final")
             - final: Released ~3rd week of following month, best station data
             - prelim: Updated every pentad (2 days after end), rapid updates
+            NOTE: For v3.0, both products are in the same directory
         """
         
         # Configuration
@@ -67,11 +68,9 @@ class CHIRPSCompleteWorkflow:
         if version == "2.0":
             self.BASE_URL = "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_monthly/tifs"
         elif version == "3.0":
-            # CHIRPS v3 structure (released January 2025)
-            if product_type == "prelim":
-                self.BASE_URL = "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/prelim/monthly/global/tifs"
-            else:  # final
-                self.BASE_URL = "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/final/monthly/global/tifs"
+            # CHIRPS v3.0 structure (released January 2025)
+            # All products (final and prelim) are in the same directory
+            self.BASE_URL = "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/monthly/global/tifs"
         else:
             raise ValueError(f"Unknown version: {version}. Use '2.0' or '3.0'")
         
@@ -115,21 +114,44 @@ class CHIRPSCompleteWorkflow:
     
     def build_filename(self, year, month):
         """
-        Build CHIRPS filename based on version
+        Build CHIRPS filename based on version and product type
         
         CHIRPS v2.0: chirps-v2.0.YYYY.MM.tif.gz
-        CHIRPS v3.0: chirps-v3.0.YYYY.MM.tif (NOT gzipped!)
+        CHIRPS v3.0 final: chirps-v3.0.YYYY.MM.tif
+        CHIRPS v3.0 prelim: chirps-v3.0.YYYY.MM.prelim.tif (not yet available)
         """
         if self.version == "2.0":
             return f"chirps-v2.0.{year}.{month:02d}.tif.gz"
         elif self.version == "3.0":
             # v3.0 files are NOT gzipped, directly .tif
-            return f"chirps-v3.0.{year}.{month:02d}.tif"
+            # For now, only final products are available
+            # Prelim products will have .prelim.tif suffix when available
+            if self.product_type == "prelim":
+                # Try prelim naming first, fallback to final
+                return f"chirps-v3.0.{year}.{month:02d}.prelim.tif"
+            else:
+                return f"chirps-v3.0.{year}.{month:02d}.tif"
     
     def get_file_url(self, year, month):
         """Get download URL for a specific month"""
         filename = self.build_filename(year, month)
         url = f"{self.BASE_URL}/{filename}"
+        
+        # For v3.0 prelim, if file doesn't exist, try final product as fallback
+        if self.version == "3.0" and self.product_type == "prelim":
+            # Check if prelim exists, otherwise use final
+            try:
+                import urllib.request
+                request = urllib.request.Request(url, method='HEAD')
+                response = urllib.request.urlopen(request, timeout=5)
+                if response.getcode() == 200:
+                    return url, filename
+            except:
+                # Fallback to final product
+                filename = f"chirps-v3.0.{year}.{month:02d}.tif"
+                url = f"{self.BASE_URL}/{filename}"
+                print(f"  Note: Using final product (prelim not available)")
+        
         return url, filename
     
     # =========================================================================
@@ -679,9 +701,13 @@ class CHIRPSCompleteWorkflow:
         
         print(f"\n💡 KEY DIFFERENCES FROM GPM:")
         print(f"  • CHIRPS data is ALREADY in mm/month (no conversion needed)")
-        print(f"  • Files are downloaded as .gz and auto-extracted to .tif")
+        print(f"  • v3.0: Files are direct .tif (no .gz extraction needed)")
+        print(f"  • v2.0: Files are .tif.gz (auto-extracted)")
         print(f"  • Resolution: 0.05° (~5.5 km) vs GPM 0.1° (~11 km)")
-        print(f"  • Coverage: 50°S-50°N (land only) vs GPM global")
+        if self.version == "3.0":
+            print(f"  • Coverage: 60°S-60°N (land) - EXPANDED from v2.0!")
+        else:
+            print(f"  • Coverage: 50°S-50°N (land only) vs GPM global")
         
         print(f"\n📁 Full output at: {self.base_dir}")
 
